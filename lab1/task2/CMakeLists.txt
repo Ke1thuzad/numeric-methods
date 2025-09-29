@@ -1,1 +1,1 @@
-add_executable(lab1task2 main.cpp main.h ../utils/matrix.h)
+add_executable(lab1task2 main.cpp main.h ${MATRIX_SRC})

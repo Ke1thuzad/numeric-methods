@@ -2,7 +2,7 @@
 #define NUMERAL_METHODS_MAIN_H
 
 #include <bits/stdc++.h>
-#include "../utils/matrix.h"
+#include "matrix.h"
 
 std::pair<Matrix<double>, double*> read_tridiagonal_matrix_from_file(const char *path);
 

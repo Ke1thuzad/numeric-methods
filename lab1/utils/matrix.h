@@ -1,7 +1,9 @@
 #ifndef NUMERAL_METHODS_MATRIX_H
 #define NUMERAL_METHODS_MATRIX_H
 
+#include <float.h>
 #include <initializer_list>
+#include <iomanip>
 
 template<class T>
 class Matrix {
@@ -12,7 +14,7 @@ public:
     Matrix(const int n = 2, const int m = 2) : n(n), m(m) {
         coefficients = new T*[n];
         for (int i = 0; i < n; i++) {
-            coefficients[i] = new T[m]();
+            coefficients[i] = new T[m](0);
         }
     }
 
@@ -67,16 +69,74 @@ public:
         delete[] coefficients;
     }
 
+    Matrix operator*(const Matrix& other) const {
+        if (m != other.n) {
+            throw std::invalid_argument("Matrix dimensions do not match for multiplication");
+        }
+
+        Matrix result(n, other.m);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < other.m; j++) {
+                result.coefficients[i][j] = 0;
+                for (int k = 0; k < m; k++) {
+                    result.coefficients[i][j] += coefficients[i][k] * other.coefficients[k][j];
+                    if (std::abs(result.coefficients[i][j]) < FLT_EPSILON) {
+                        result.coefficients[i][j] = 0;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     friend std::ostream& operator<<(std::ostream& stream, const Matrix& mat) {
         stream << "Matrix (N: " << mat.n << ", M: " << mat.m << ")" << std::endl;
 
+        std::ios_base::fmtflags original_flags = stream.flags();
+        std::streamsize original_precision = stream.precision();
+
+        stream << std::fixed << std::setprecision(6);
+
         for (int i = 0; i < mat.n; i++) {
             for (int j = 0; j < mat.m; j++) {
-                stream << mat.coefficients[i][j] << ' ';
+                stream << std::setw(12) << mat.coefficients[i][j] << " ";
             }
             stream << std::endl;
         }
+
+        stream.flags(original_flags);
+        stream.precision(original_precision);
+
         return stream;
+    }
+};
+
+template <class T>
+class LinearEquation {
+public:
+    int n;
+    Matrix<T> matrix;
+    T* b;
+
+    LinearEquation(int n = 4) : n(n), matrix(n, n), b(new T[n]()) {}
+
+    LinearEquation(const LinearEquation& other) : n(other.n), matrix(other.matrix), b(new T[other.n]) {
+        std::copy(other.b, other.b + n, b);
+    }
+
+    LinearEquation& operator=(const LinearEquation& other) {
+        if (this != &other) {
+            delete[] b;
+            n = other.n;
+            matrix = other.matrix;
+            b = new T[n];
+            std::copy(other.b, other.b + n, b);
+        }
+        return *this;
+    }
+
+    ~LinearEquation() {
+        delete[] b;
     }
 };
 
