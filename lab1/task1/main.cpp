@@ -186,42 +186,56 @@ Matrix<T> inverseMatrix(const Matrix<T> &A) {
 
     LUPResult<T> lup = LUPDecomposition(A);
 
-    Matrix<T> Z(n, n);
-    for (int j = 0; j < n; j++) {
-        for (int i = 0; i < n; i++) {
-            T sum = 0;
-            for (int k = 0; k < i; k++) {
-                sum += lup.L.coefficients[i][k] * Z.coefficients[k][j];
-            }
-            Z.coefficients[i][j] = lup.P.coefficients[i][j] - sum;
-        }
-    }
+    // Matrix<T> Z(n, n);
+    // for (int j = 0; j < n; j++) {
+    //     for (int i = 0; i < n; i++) {
+    //         T sum = 0;
+    //         for (int k = 0; k < i; k++) {
+    //             sum += lup.L.coefficients[i][k] * Z.coefficients[k][j];
+    //         }
+    //         Z.coefficients[i][j] = lup.P.coefficients[i][j] - sum;
+    //     }
+    // }
+    //
+    // Matrix<T> U_inv(n, n);
 
-    Matrix<T> U_inv(n, n);
+    Matrix<T> inv(n, n);
 
-    for (int j = n - 1; j >= 0; --j) {
-        T sum_diag = 0;
-        for (int k = j + 1; k < n; ++k) {
-            sum_diag += lup.U.coefficients[j][k] * U_inv.coefficients[k][j];
-        }
-        U_inv.coefficients[j][j] = (1.0 - sum_diag) / lup.U.coefficients[j][j];
-
-        for (int i = j - 1; i >= 0; --i) {
-            T sum_upper = 0;
+    for (int i = n - 1; i >= 0; --i) {
+        for (int j = n - 1; j > i - 1; --j) {
+            T row_sum = 0;
             for (int k = i + 1; k < n; ++k) {
-                sum_upper += lup.U.coefficients[i][k] * U_inv.coefficients[k][j];
+                row_sum += lup.U.coefficients[i][k] * inv.coefficients[k][j];
             }
-            U_inv.coefficients[i][j] = -sum_upper / lup.U.coefficients[i][i];
+
+            if (i == j)
+                inv.coefficients[i][i] = (1.0 - row_sum) / lup.U.coefficients[i][i];
+            else
+                inv.coefficients[i][j] = -row_sum / lup.U.coefficients[i][i];
         }
 
-        for (int i = n - 1; i > j; --i) {
-            T sum_lower = 0;
+        for (int j = i - 1; j >= 0; --j) {
+            T row_sum = 0;
             for (int k = j + 1; k < n; ++k) {
-                sum_lower += U_inv.coefficients[i][k] * lup.U.coefficients[k][j];
+                row_sum += inv.coefficients[i][k] * lup.L.coefficients[k][j];
             }
-            U_inv.coefficients[i][j] = -sum_lower;
+            inv.coefficients[i][j] = -row_sum;
         }
     }
 
-    return U_inv * Z;
+    return inv * lup.P;
 }
+//
+// template <class T>
+// Matrix<T> inverseSolvedMatrix(LUPResult<T> lup, T* x) {
+//     const int n = lup.L.n;
+//
+//     Matrix<T> result(n, n);
+//
+//     for (int i = n - 1; i >= 0; --i) {
+//         T sum_diag = 0;
+//         for (int k = i + 1; i < n; ++i) {
+//             sum_diag += lup.U.coefficients[i][k] * x[]
+//         }
+//     }
+// }
