@@ -1,7 +1,7 @@
 #ifndef NUMERAL_METHODS_MATRIX_H
 #define NUMERAL_METHODS_MATRIX_H
 
-#include <float.h>
+#include <cfloat>
 #include <initializer_list>
 #include <iomanip>
 
@@ -10,6 +10,10 @@ class Matrix {
 public:
     int n, m;
     T **coefficients;
+
+    explicit Matrix(const int n = 2) {
+        *this = Matrix(n, n);
+    }
 
     Matrix(const int n = 2, const int m = 2) : n(n), m(m) {
         coefficients = new T*[n];
@@ -86,6 +90,118 @@ public:
                 }
             }
         }
+        return result;
+    }
+
+    Matrix operator*(const T other) const {
+        Matrix result(n, m);
+
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                result.coefficients[i][j] = coefficients[i][j] * other;
+            }
+        }
+
+        return result;
+    }
+
+    Matrix operator+(const Matrix& other) const {
+        if (n != other.n && m != other.m)
+            throw std::invalid_argument("Matrix dimensions do not match for summation");
+
+        Matrix result(n, m);
+
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                result.coefficients[i][j] = coefficients[i][j] + other.coefficients[i][j];
+            }
+        }
+
+        return result;
+    }
+
+    Matrix operator+(const T other) const {
+        Matrix result(n, m);
+
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                result.coefficients[i][j] = coefficients[i][j] + other;
+            }
+        }
+
+        return result;
+    }
+
+    Matrix operator-() const {
+        Matrix result(n, m);
+
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                result.coefficients[i][j] = -coefficients[i][j];
+            }
+        }
+
+        return result;
+    }
+
+    Matrix operator-(const Matrix& other) const {
+        return *this + (-other);
+    }
+
+    Matrix operator-(const T other) const {
+        return *this + (-other);
+    }
+
+    Matrix& operator*=(const Matrix& other) {
+        *this = *this * other;
+        return *this;
+    }
+
+    Matrix& operator+=(const Matrix& other) {
+        *this = *this + other;
+        return *this;
+    }
+
+    Matrix& operator-=(const Matrix& other) {
+        *this = *this - other;
+        return *this;
+    }
+
+    static Matrix Identity(int size) {
+        if (size <= 0) {
+            throw std::invalid_argument("Identity matrix size must be positive");
+        }
+
+        Matrix result(size, size);
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                result.coefficients[i][j] = (i == j) ? T(1) : T(0);
+            }
+        }
+        return result;
+    }
+
+    Matrix transpose() const {
+        Matrix result(m, n);
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                result.coefficients[j][i] = coefficients[i][j];
+            }
+        }
+
+        return result;
+    }
+
+    static Matrix Householder(Matrix v) {
+        Matrix vT = v.transpose();
+
+        Matrix squared = vT * v;
+
+        squared.coefficients[0][0] = 2 / squared.coefficients[0][0];
+
+        Matrix result = Matrix::Identity(v.n) - (v * vT) * squared.coefficients[0][0];
+
         return result;
     }
 

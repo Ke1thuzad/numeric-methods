@@ -1,1 +1,2 @@
-add_executable(lab1task1 main.h main.cpp)
+add_executable(lab1task1 main.h main.cpp
+        lup.h)

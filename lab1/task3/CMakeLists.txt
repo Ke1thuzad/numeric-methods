@@ -1,0 +1,1 @@
+add_executable(lab1task3 main.cpp main.h ../utils/matrix.cpp)

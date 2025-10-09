@@ -8,6 +8,8 @@ int main(const int argc, char **argv) {
 
         const double* res = thomas_algorithm(matrix, d);
 
+
+
         for (int i = 0; i < matrix.n; ++i) {
             std::cout << res[i] << ", ";
         }
@@ -64,7 +66,7 @@ std::pair<Matrix<double>, double*> read_tridiagonal_matrix_from_file(const char 
     return {matrix, d};
 }
 
-double* thomas_algorithm(const Matrix<double>& mat, double* d) {
+double* thomas_algorithm(const Matrix<double>& mat, const double* d) {
     double* P = new double[mat.n];
     double* Q = new double[mat.n];
     double* x = new double[mat.n];

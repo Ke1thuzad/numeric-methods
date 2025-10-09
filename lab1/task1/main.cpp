@@ -24,7 +24,6 @@ int main(const int argc, char **argv) {
         }
         std::cout << std::endl;
 
-        // Calculate determinant
         const double det = determinantLUP(lup);
         std::cout << "Determinant of A: " << det << std::endl << std::endl;
 
@@ -41,16 +40,14 @@ int main(const int argc, char **argv) {
 
 LinearEquation<double> read_equation_from_file(const char *path) {
     std::ifstream stream(path);
-    if (!stream.is_open()) {
+    if (!stream.is_open())
         throw std::runtime_error("Cannot open file");
-    }
 
     int n;
     stream >> n;
 
-    if (n <= 0) {
+    if (n <= 0)
         throw std::domain_error("Matrix size cannot be less than 1");
-    }
 
     LinearEquation<double> equation(n);
 
@@ -70,172 +67,3 @@ LinearEquation<double> read_equation_from_file(const char *path) {
 
     return equation;
 }
-
-template<class T>
-LUPResult<T> LUPDecomposition(const Matrix<T> &A) {
-    int n = A.n;
-    LUPResult<T> result(n);
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            result.P.coefficients[i][j] = (i == j) ? 1 : 0;
-        }
-    }
-
-    Matrix<T> PA = A;
-
-    for (int k = 0; k < n; k++) {
-        T maxVal = 0;
-        int maxIndex = k;
-        for (int i = k; i < n; i++) {
-            T absVal = std::abs(PA.coefficients[i][k]);
-            if (absVal > maxVal) {
-                maxVal = absVal;
-                maxIndex = i;
-            }
-        }
-
-        if (maxVal == 0) {
-            throw std::runtime_error("Matrix is singular");
-        }
-
-        if (maxIndex != k) {
-            for (int j = 0; j < n; j++) {
-                std::swap(PA.coefficients[k][j], PA.coefficients[maxIndex][j]);
-                std::swap(result.P.coefficients[k][j], result.P.coefficients[maxIndex][j]);
-            }
-            ++result.swaps;
-        }
-    }
-
-    for (int i = 0; i < n; i++) {
-        for (int j = i; j < n; j++) {
-            T sum = 0;
-            for (int k = 0; k < i; k++) {
-                sum += result.L.coefficients[i][k] * result.U.coefficients[k][j];
-            }
-            result.U.coefficients[i][j] = PA.coefficients[i][j] - sum;
-        }
-
-        for (int j = i; j < n; j++) {
-            if (i == j) {
-                result.L.coefficients[i][i] = 1;
-            } else {
-                T sum = 0;
-                for (int k = 0; k < i; k++) {
-                    sum += result.L.coefficients[j][k] * result.U.coefficients[k][i];
-                }
-                result.L.coefficients[j][i] = (PA.coefficients[j][i] - sum) / result.U.coefficients[i][i];
-            }
-        }
-    }
-
-    return result;
-}
-
-template<class T>
-T *solveLUP(const LUPResult<T> &lup, const T *b) {
-    const int n = lup.L.n;
-    T *y = new T[n];
-    T *x = new T[n];
-
-    T *b_perm = new T[n];
-    for (int i = 0; i < n; i++) {
-        b_perm[i] = 0;
-        for (int j = 0; j < n; j++) {
-            b_perm[i] += lup.P.coefficients[i][j] * b[j];
-        }
-    }
-
-    for (int i = 0; i < n; i++) {
-        T sum = 0;
-        for (int j = 0; j < i; j++) {
-            sum += lup.L.coefficients[i][j] * y[j];
-        }
-        y[i] = b_perm[i] - sum;
-    }
-
-    for (int i = n - 1; i >= 0; --i) {
-        T sum = 0;
-        for (int j = i + 1; j < n; ++j) {
-            sum += lup.U.coefficients[i][j] * x[j];
-        }
-        x[i] = (y[i] - sum) / lup.U.coefficients[i][i];
-    }
-
-    delete[] y;
-    delete[] b_perm;
-    return x;
-}
-
-template<class T>
-T determinantLUP(const LUPResult<T> &lup) {
-    T det = 1;
-    for (int i = 0; i < lup.U.n; i++) {
-        det *= lup.U.coefficients[i][i];
-    }
-    return (lup.swaps % 2 == 0) ? det : -det;
-}
-
-template<class T>
-Matrix<T> inverseMatrix(const Matrix<T> &A) {
-    int n = A.n;
-
-    if (n != A.m)
-        throw std::runtime_error("Matrix must be square for inversion");
-
-    LUPResult<T> lup = LUPDecomposition(A);
-
-    // Matrix<T> Z(n, n);
-    // for (int j = 0; j < n; j++) {
-    //     for (int i = 0; i < n; i++) {
-    //         T sum = 0;
-    //         for (int k = 0; k < i; k++) {
-    //             sum += lup.L.coefficients[i][k] * Z.coefficients[k][j];
-    //         }
-    //         Z.coefficients[i][j] = lup.P.coefficients[i][j] - sum;
-    //     }
-    // }
-    //
-    // Matrix<T> U_inv(n, n);
-
-    Matrix<T> inv(n, n);
-
-    for (int i = n - 1; i >= 0; --i) {
-        for (int j = n - 1; j > i - 1; --j) {
-            T row_sum = 0;
-            for (int k = i + 1; k < n; ++k) {
-                row_sum += lup.U.coefficients[i][k] * inv.coefficients[k][j];
-            }
-
-            if (i == j)
-                inv.coefficients[i][i] = (1.0 - row_sum) / lup.U.coefficients[i][i];
-            else
-                inv.coefficients[i][j] = -row_sum / lup.U.coefficients[i][i];
-        }
-
-        for (int j = i - 1; j >= 0; --j) {
-            T row_sum = 0;
-            for (int k = j + 1; k < n; ++k) {
-                row_sum += inv.coefficients[i][k] * lup.L.coefficients[k][j];
-            }
-            inv.coefficients[i][j] = -row_sum;
-        }
-    }
-
-    return inv * lup.P;
-}
-//
-// template <class T>
-// Matrix<T> inverseSolvedMatrix(LUPResult<T> lup, T* x) {
-//     const int n = lup.L.n;
-//
-//     Matrix<T> result(n, n);
-//
-//     for (int i = n - 1; i >= 0; --i) {
-//         T sum_diag = 0;
-//         for (int k = i + 1; i < n; ++i) {
-//             sum_diag += lup.U.coefficients[i][k] * x[]
-//         }
-//     }
-// }
