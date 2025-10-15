@@ -8,7 +8,8 @@
 #include <fstream>
 #include <vector>
 
-LinearEquation<double> read_equation_from_file(const char *path);
+template <class T>
+LinearEquation<T> read_equation_from_file(const char *path);
 
 template<class T>
 T norm(Matrix<T> A);

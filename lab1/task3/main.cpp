@@ -1,14 +1,17 @@
 #include "main.h"
 
+#include <cmath>
+#include <limits>
+
 int main(const int argc, char **argv) {
     if (argc == 2) {
-        const LinearEquation<double> equation = read_equation_from_file(argv[1]);
+        const LinearEquation<double> equation = read_equation_from_file<double>(argv[1]);
 
-        constexpr double eps = 10e-32;
+        constexpr double eps = std::numeric_limits<double>::epsilon();
 
         std::cout << "-----------Simple Iterations Method-----------" << std::endl;
 
-        Matrix<double> result = simple_iterations_method(equation, eps);
+        Matrix<double> result = simple_iterations_method<double>(equation, eps);
 
         std::cout << result << equation.matrix * result;
 
@@ -24,7 +27,8 @@ int main(const int argc, char **argv) {
     return 0;
 }
 
-LinearEquation<double> read_equation_from_file(const char *path) {
+template <class T>
+LinearEquation<T> read_equation_from_file(const char *path) {
     std::ifstream stream(path);
     if (!stream.is_open()) {
         throw std::runtime_error("Cannot open file");
@@ -37,7 +41,7 @@ LinearEquation<double> read_equation_from_file(const char *path) {
         throw std::domain_error("Matrix size cannot be less than 1");
     }
 
-    LinearEquation<double> equation(n);
+    LinearEquation<T> equation(n);
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -58,12 +62,13 @@ LinearEquation<double> read_equation_from_file(const char *path) {
 
 template<class T>
 T norm(Matrix<T> A) {
-    T max_row_sum = 0;
+    T max_row_sum = T(0);
 
     for (int i = 0; i < A.n; ++i) {
-        T row_sum = 0;
-        for (int j = 0; j < A.n; ++j) {
-            row_sum += std::abs(A.coefficients[i][j]);
+        T row_sum = T(0);
+        for (int j = 0; j < A.m; ++j) {
+            T A_abs = std::abs(A.coefficients[i][j]);
+            row_sum += A_abs;
         }
 
         max_row_sum = std::max(max_row_sum, row_sum);
@@ -76,7 +81,9 @@ template <class T>
 Matrix<T> simple_iterations_loop(const Matrix<T>& alpha, const Matrix<T>& beta, const T eps) {
     Matrix<T> x_k, x_k_prev = beta;
 
-    T eps_k;
+    T eps_k = T(0);
+
+    T norm_alpha = norm(alpha);
 
     int i = 0;
 
@@ -84,8 +91,6 @@ Matrix<T> simple_iterations_loop(const Matrix<T>& alpha, const Matrix<T>& beta, 
         ++i;
 
         x_k = beta + alpha * x_k_prev;
-
-        T norm_alpha = norm(alpha);
 
         T norm_x_k = norm(x_k - x_k_prev);
 

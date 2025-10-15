@@ -148,7 +148,6 @@ Matrix<double> QR_eigenvalues(const Matrix<double> &A, const double eps) {
                 if (std::abs(x1 - x1_prev) <= eps) {
                     int real_pos = (i + 2) % A.n;
 
-                    // std::cout << std::format("Complex roots are located on rows {} and {}", i + 1, i + 2) << std::endl;
                     std::cout << std::format("Complex roots: {:.6f} + {:.6f}i; {:.6f} - {:.6f}i.", x1.real(), x1.imag(),
                                              x2.real(), -x2.imag()) << std::endl;
                     std::cout << std::format("Real root: {:.6f}", A_k.coefficients[real_pos][real_pos]) << std::endl;

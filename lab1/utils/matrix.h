@@ -11,7 +11,7 @@ public:
     int n, m;
     T **coefficients;
 
-    explicit Matrix(const int n = 2) {
+    explicit Matrix(const int n) {
         *this = Matrix(n, n);
     }
 
