@@ -1,0 +1,1 @@
+add_executable(lab2task2 main.h main.cpp)

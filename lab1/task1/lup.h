@@ -121,6 +121,12 @@ T determinantLUP(const LUPResult<T> &lup) {
 
 template<class T>
 T determinant(const Matrix<T>& A) {
+    if (A.n == A.m && A.n == 2) {
+        T** coef = A.coefficients;
+
+        return coef[0][0] * coef[1][1] - coef[1][0] * coef[0][1];
+    }
+
     LUPResult<T> lup = LUPDecomposition(A);
 
     return determinantLUP(lup);

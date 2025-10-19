@@ -1,0 +1,1 @@
+add_executable(lab2task1 main.cpp main.h ${MATRIX_SRC})

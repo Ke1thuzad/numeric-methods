@@ -1,1 +1,1 @@
-add_executable(lab1task5 main.cpp main.h ../utils/matrix.cpp)
+add_executable(lab1task5 main.cpp main.h ../../utils/matrix.cpp)
