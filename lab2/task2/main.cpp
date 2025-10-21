@@ -2,10 +2,10 @@
 
 
 int main() {
-    const double eps = std::numeric_limits<double>::epsilon();
-    const double q = 0.9;
+    constexpr double eps = std::numeric_limits<double>::epsilon();
+    constexpr double q = 0.9;
 
-    std::vector<func> phi = {
+    const std::vector<func> phi = {
         [](const Matrix<double>& x) {  // 1 + cos(x2)
             return 1 + std::cos(x.coefficients[1][0]);
         },
@@ -14,7 +14,7 @@ int main() {
         }
     };
 
-    const Matrix<double> starting_vector {{0.45}, {2.15}};
+    const Matrix starting_vector {{0.45}, {2.15}};  // x1_0 = 0.45, x2_0 = 2.15
 
     std::cout << std::format("{:-^27}", "Newton Method") << std::endl;
 
@@ -43,16 +43,17 @@ Matrix<double> Jacobi(const Matrix<double>& x) {
 Matrix<double> A1(const Matrix<double>& x) {
     double** xc = x.coefficients;
     return {
-        {xc[0][0] - std::cos(xc[1][0]) - 1, std::sin(xc[1][0])},
-        {xc[1][0] - std::log10(xc[0][0] + 1) - 2, 1}
+        {xc[0][0] - cos(xc[1][0]) - 1, sin(xc[1][0])},
+        {xc[1][0] - log10(xc[0][0] + 1) - 2, 1}
     };
 }
 
 Matrix<double> A2(const Matrix<double>& x) {
+
     double** xc = x.coefficients;
     return {
-        {1, xc[0][0] - std::cos(xc[1][0]) - 1},
-        {-1 / ((xc[0][0] + 1) * std::log(10)), xc[1][0] - std::log10(xc[0][0] + 1) - 2}
+        {1, xc[0][0] - cos(xc[1][0]) - 1},
+        {-1 / ((xc[0][0] + 1) * log(10)), xc[1][0] - log10(xc[0][0] + 1) - 2}
     };
 }
 
