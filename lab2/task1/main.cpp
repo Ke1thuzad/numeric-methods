@@ -7,6 +7,8 @@ int main() {
     constexpr double q = 0.5;
     constexpr double eps = std::numeric_limits<double>::epsilon();
 
+    std::cout << "Current epsilon: " << std::scientific << eps << std::endl << std::endl;
+
     std::cout << std::format("{:-^27}", "Newton Method") << std::endl;
 
     double root = Newton_method(x0, f1, f1_dx, eps);

@@ -9,3 +9,4 @@ file(GLOB MATRIX_SRC "${CMAKE_SOURCE_DIR}/utils/*.cpp")
 
 add_subdirectory(lab1)
 add_subdirectory(lab2)
+add_subdirectory(lab3)

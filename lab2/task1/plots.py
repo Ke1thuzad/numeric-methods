@@ -16,7 +16,9 @@ y1 = np.cos(x) + 0.25 * x - 0.5
 y2 = np.arccos(0.5 - 0.25 * x)
 y3 = 1 / np.sqrt(-(x * x) + 4 * x + 12)
 
-y4 = -np.cos(x)
+y4 = -np.cos(x)  # вторая производная
+
+y5 = -np.sin(x) + 0.25  # первая производная
 
 fig, ax = plt.subplots(2, 3)
 
@@ -26,24 +28,31 @@ ax[0, 0].set_title('Исходная $f(x)$')
 ax[0, 0].plot(x, y1, label='cos(x) + 0.25x - 0.5')
 ax[0, 0].set_ylim(-4, 4)
 
-ax[0, 1].set_title(r'$\varphi(x)=arccos(0.5 - 0.25 * x)$')
-ax[0, 1].plot(x, y2, label='arccos(0.5 - 0.25 * x)')
-ax[0, 1].plot(x, x, label='x')
-ax[0, 1].plot(x, y3, label=r'$\frac{1}{\sqrt{-x^2+4x+12}}$')
-ax[0, 1].set_xlim(0, 3)
-ax[0, 1].set_ylim(0, 3)
+ax[0, 1].set_title(r'Выделяем линейный член $x=\varphi(x)$')
+ax[0, 1].plot(x, y2, label=r'$\varphi(x)=arccos(0.5 - 0.25 * x)$')
+ax[0, 1].plot(x, x, label=r'$x$')
+ax[0, 1].plot(x, y3, label=r'$\varphi^{\prime}(x)=\frac{1}{\sqrt{-x^2+4x+12}}$')
+ax[0, 1].set_xlim(-2.5, 7.5)
+ax[0, 1].set_ylim(-2.5, 5)
 
-ax[0, 2].set_title(r'$\varphi^{\prime}(x)=\frac{1}{\sqrt{-x^2+4x+12}}$')
+ax[0, 2].set_title(r'Выделенный линейный член в приближении')
+ax[0, 2].plot(x, y2, label='$arccos(0.5 - 0.25 * x)$')
+ax[0, 2].plot(x, x, label='$x$')
 ax[0, 2].plot(x, y3, label=r'$\frac{1}{\sqrt{-x^2+4x+12}}$')
+ax[0, 2].set_xlim(0, 3)
+ax[0, 2].set_ylim(0, 3)
 
 
 # Метод Ньютона
-ax[1, 0].set_title(r'$f^{\prime\prime}(x)=-cos(x)$')
-ax[1, 0].plot(x, y4, label='$-cos(x)$')
+ax[1, 0].set_title(r'$f^{\prime\prime}(x)=-cos(x)$, $f^{\prime}(x)=-sin(x) + 0.25$')
+ax[1, 0].plot(x, y4, label='$-cos(x)$', color='orange')
+ax[1, 0].plot(x, y5, label='$-sin(x) + 0.25$', color='green')
+
 
 ax[1, 1].set_title(r'$f^{\prime\prime}(x)$ и $f(x)$')
 ax[1, 1].plot(x, y1, label='$cos(x) + 0.25x - 0.5$')
 ax[1, 1].plot(x, y4, label='$-cos(x)$')
+# ax[1, 1].plot(x, y5, label='$-sin(x) + 0.25$')
 
 ax[1, 2].set_title('Первый положительный корень (приближено)')
 ax[1, 2].plot(x, y1, label='$cos(x) + 0.25x - 0.5$')

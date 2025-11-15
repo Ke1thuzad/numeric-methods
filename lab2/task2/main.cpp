@@ -5,6 +5,8 @@ int main() {
     constexpr double eps = std::numeric_limits<double>::epsilon();
     constexpr double q = 0.9;
 
+    std::cout << "Current epsilon: " << std::scientific << eps << std::endl << std::endl;
+
     const std::vector<func> phi = {
         [](const Matrix<double>& x) {  // 1 + cos(x2)
             return 1 + std::cos(x.coefficients[1][0]);
@@ -102,7 +104,7 @@ Matrix<double> simple_iterations_method_system(const Matrix<double>& starting_ve
     return x_k;
 }
 
-Matrix<double> Newton_method_system(const Matrix<double>& starting_vector, const std::vector<mx_func>& A, mx_func J, const double eps) {
+Matrix<double> Newton_method_system(const Matrix<double>& starting_vector, const std::vector<mx_func>& A, const mx_func J, const double eps) {
     Matrix<double> x_k = starting_vector;
 
     double delta = 1;

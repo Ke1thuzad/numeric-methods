@@ -110,6 +110,43 @@ T *solveLUP(const LUPResult<T> &lup, const T *b) {
 }
 
 template<class T>
+T *solveEquation(const LinearEquation<T> &equation) {
+    auto lup = LUPDecomposition(equation.matrix);
+
+    const int n = lup.L.n;
+    T *y = new T[n];
+    T *x = new T[n];
+
+    T *b_perm = new T[n];
+    for (int i = 0; i < n; i++) {
+        b_perm[i] = 0;
+        for (int j = 0; j < n; j++) {
+            b_perm[i] += lup.P.coefficients[i][j] * equation.b[j];
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        T sum = 0;
+        for (int j = 0; j < i; j++) {
+            sum += lup.L.coefficients[i][j] * y[j];
+        }
+        y[i] = b_perm[i] - sum;
+    }
+
+    for (int i = n - 1; i >= 0; --i) {
+        T sum = 0;
+        for (int j = i + 1; j < n; ++j) {
+            sum += lup.U.coefficients[i][j] * x[j];
+        }
+        x[i] = (y[i] - sum) / lup.U.coefficients[i][i];
+    }
+
+    delete[] y;
+    delete[] b_perm;
+    return x;
+}
+
+template<class T>
 T determinantLUP(const LUPResult<T> &lup) {
     T det = 1;
     for (int i = 0; i < lup.U.n; i++) {

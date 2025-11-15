@@ -1,0 +1,1 @@
+add_executable(lab3task4 main.cpp main.h functions.cpp)
