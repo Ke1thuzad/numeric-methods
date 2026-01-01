@@ -1,7 +1,3 @@
-//
-// Created by Dmitriy on 19.10.2025.
-//
-
 #ifndef NUMERIC_METHODS_MAIN_H
 #define NUMERIC_METHODS_MAIN_H
 

@@ -15,7 +15,7 @@ int main() {
     double x_end = 1;
     double h1 = 0.5;
     double h2 = 0.25;
-    double F_exact = 0.104471;
+    double correct_F = 0.104471;
 
     std::cout << "=== h1 = " << h1 << " ===" << std::endl;
     double Fh1_rect = rectangle_method(var_func, x_beg, x_end, h1);
@@ -36,9 +36,9 @@ int main() {
     std::cout << "Simpson: " << Fh2_simp << std::endl << std::endl;
 
     std::cout << "=== Runge-Romberg Error ===" << std::endl;
-    double error_rect = runge_romberg_richardson_error_method(F_exact, Fh1_rect, Fh2_rect, h1 / h2, 2);
-    double error_trap = runge_romberg_richardson_error_method(F_exact, Fh1_trap, Fh2_trap, h1 / h2, 2);
-    double error_simp = runge_romberg_richardson_error_method(F_exact, Fh1_simp, Fh2_simp, h1 / h2, 4);
+    double error_rect = runge_romberg_richardson_error_method(correct_F, Fh1_rect, Fh2_rect, h1 / h2, 2);
+    double error_trap = runge_romberg_richardson_error_method(correct_F, Fh1_trap, Fh2_trap, h1 / h2, 2);
+    double error_simp = runge_romberg_richardson_error_method(correct_F, Fh1_simp, Fh2_simp, h1 / h2, 4);
 
     std::cout << "Rectangle: " << error_rect << std::endl;
     std::cout << "Trapezoid: " << error_trap << std::endl;
